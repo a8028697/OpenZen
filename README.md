@@ -16,6 +16,56 @@
 ## 截图
 ![Open Zen ClickGUI](img/screenshot.png)
 
+## 后门
+我们在逆向时发现原版Zen存在大量后门，例如上报QQ、屏幕截图、扫描文件、上传文件、远程执行命令等。因此我们**不推荐**任何用户继续使用原版Zen，除非你愿意现在把你身上的衣服脱掉然后去本地人最多的广场裸舞，然后把自己裸舞的视频发送到Zen的群内。
+
+当Zen被注入后，会自动触发截图并上传至服务器。精神马来西亚人回应如下：
+
+![Screenshot Response](./img/screenshot-response.png)
+
+由于精神马来西亚人从小父母双亡，无父无母的精神马来西亚人自幼脑回路不正常。他认为虽然自己没有说自己的外挂会截图，但是由于自己截图，并没有遭到用户反对，所以所以用户都心甘情愿被截图**全屏**并上传到其服务器上。当然不排除所有Zen客户端用户都喜欢把身上的衣服脱掉然后去本地人最多的广场裸舞的可能性。
+
+![Snapshot](./img/meme.jpeg)
+
+### 分析
+当Zen启动时，会自动调用 `iIiIiIiIIIiIiI/Ʊ Đ()Ljava/awt/image/BufferedImage` ([Mapping](./mapping/zen.mapping#L140))，可能由于精神马来西亚人自知是后门，因此精神马来西亚人将此方法严防死守，惨遭没有逼卵子用的Native混淆。
+
+以下是对该方法的Trace。
+
+![Screenshot Trace](./img/screenshot-trace.png)
+
+可见，此方法调用了 `java/awt/Robot;createScreenCapture(Ljava/awt/Rectangle)`，会将用户的**全屏**截图后返回。
+
+继续向下追踪，发现其新建了 `iIiIiIiIIIiIiI/ɿ` (`CPacketSystemInfo`) ([Mapping](./mapping/zen.mapping#L2552)) 对象，我们对该类反编译，发现精神马来西亚人妈妈死掉了所以忘记删除Lombok自动生成的`@ToString`方法，因此惨遭Claude还原。
+
+![CPacketSystemInfo](./img/CPacketSystemInfo_ToString.png)
+
+此包会上传用户处理器信息、模组列表、虚拟机参数、系统名称、上报截图等信息，但笔者认为除截图外，其他信息收集在**提前告知用户的前提下**是合理的，因此并无不妥。虽然精神马来西亚人没有提前告知用户。
+
+随后，笔者继续分析。由于该类继承了 `iIiIiIiIIIiIiI/ɰ` (`Packet`) ([Mapping](./mapping/zen.mapping#L2459))，我们分析了所有该类的子类。
+
+遗憾的，其他类由于没有添加Lombok标识，我们我们不得不通过其他方式Trace这些类的具体用途。经过我们不懈努力的调试和追踪，我们还原出了我们认为可疑的部分行为。
+
+- 远程命令执行 `iIiIiIiIIIiIiI/ʔ`
+- 远程文件下发 `iIiIiIiIIIiIiI/ʏ`
+- 远程文件浏览 `iIiIiIiIIIiIiI/ʑ`
+
+*以上不是全部*
+
+![RCE](./img/RCE.png)
+
+对于这些后门，精神马来西亚人作此解释。
+
+![Backdoor](./img/backdoor.png)
+
+精神马来西亚人称这些后门全部都是由**夏天233**制造，并非自己。并且这些后门并没有实现，所以可能是由于精神马来西亚人产生幻觉导致笔者抓到了Trace。而且并不能解释同是一套Network系统，为什么上传截图包实现了但其他方法没有实现。
+
+其后其在[视频](https://www.bilibili.com/video/BV147L86TEEZ)中表示，是服务器在迁移时没有实现，而不是客户端没有实现。同时，精神马来西亚人在视频中表示*没有功能*，但是在QQ群中表示*是夏天233写的*。
+
+![Backdoor](./img/backdoor_2.png)
+
+由于精神马来西亚人嘴硬，所以到底具体有没有实现，笔者暂且蒙古。
+
 ## 原始 Jar + Mapping
 [原始Jar](./mapping/zen-orignial.jar)
 [Mapping](./mapping/zen.mapping)
@@ -30,15 +80,6 @@
 其他的混淆经过Opus长达30秒的分析，顺利写出了反混淆器。 但被Rename后的代码几乎不可读，因此我用Opus 4.7制作了[Enigma MCP](https://github.com/Margele/Enigma-MCP)，接入Sonnet 4.6对其参照部分客户端进行了反混淆。
 
 再使用Opus 4.7对本项目经过长达6小时的修复和少量的人工修复，便得到了这份源码。
-
-## 后门
-原版的Zen存在大量后门，例如上报QQ、屏幕截图、扫描文件、上传文件、远程执行命令等。因此我们不推荐任何用户继续使用原版Zen，除非你愿意现在把你身上的衣服脱掉然后去本地人最多的广场裸舞，然后把自己裸舞的视频发送到Zen的群内。
-
-由于精神马来西亚人从小父母双亡，无父无母的精神马来西亚人自幼脑回路不正常。
-![Snapshot](./img/meme.jpg)
-
-
-[详细分析](./mapping/BACKDOOR.md)
 
 ## 抄袭
 此项目大部分功能模块几乎全部抄袭自Naven客户端，具体详见以下分析。
